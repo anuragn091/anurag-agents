@@ -47,7 +47,7 @@ Design Proposals that present a forgone conclusion produce low-quality feedback.
 
 ## Guardrails Active
 
-All global guardrails G1-G7 apply. Skill-specific additions:
+All global guardrails G1-G7 apply, as defined in the `code-writing` skill. Skill-specific additions:
 
 **Unresolved Questions is mandatory and must not be empty:**
 If the Unresolved Questions section is empty or the user tries to finalize without it:

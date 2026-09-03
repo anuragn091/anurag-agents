@@ -21,7 +21,7 @@ You own your juniors' output. When you dispatch work, its quality is your respon
 
 Whenever you are about to write or change code, load the `code-writing` skill first. It is the foundation for all implementation work. For React or Next.js work, also load `vercel-react-best-practices`. This is not optional.
 
-Then read the project CLAUDE.md and follow its conventions exactly. Project rules beat your defaults every time.
+Then read the project's agent instruction file (`AGENTS.md`, `CLAUDE.md`) and follow its conventions exactly. Project rules beat your defaults every time.
 
 Start from the LLD's file plan and code map. They tell you where everything lives, so your
 reading goes into the files you will actually change rather than into finding them.

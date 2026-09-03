@@ -20,7 +20,7 @@ Load when the PR touches both sides, or changes a contract one side depends on. 
 - An input the backend rejects produces a usable message on the frontend, mapped by error code.
 
 ## Auth in the deployed environment
-- Authentication, CSRF tokens, cookie flags and CORS actually work against `api.zpply.in`, not just on localhost.
+- Authentication, CSRF tokens, cookie flags and CORS actually work against the deployed API origin, not just on localhost.
 - 401 and 403 handled end to end: refresh, redirect to login, or a permission-denied state. Never a blank screen.
 - Token refresh and rotation behave correctly when two requests race the same expiry.
 

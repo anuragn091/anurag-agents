@@ -24,7 +24,7 @@ metadata:
 
 **Purpose:** review a change the way a staff engineer does. Judge the change against the system it lands in, not against itself. Every finding is verified against the actual code before it is written down, and every finding carries a priority so preference-level feedback never blocks a sound change.
 
-**This skill reviews. It does not fix.** No `Write`, no `Edit`. If the user wants the findings applied, hand the work to `/fix-comments`, `/dispatch`, or the built-in `/code-review --fix` after the review is posted.
+**This skill reviews. It does not fix.** No `Write`, no `Edit`. If the user wants the findings applied, hand the work to a separate implementation pass after the review is posted.
 
 ---
 
@@ -38,7 +38,7 @@ metadata:
 | a branch name | That branch against `main` |
 | a path or diff pasted in | Exactly what was given |
 
-Submodules: this repo has `zpply-frontend` and `zpply-backend` as submodules. Check the diff in each one, not just the parent pointer bump. A parent commit that only moves a submodule SHA is not a reviewable diff, go into the submodule and diff there.
+Submodules: if the project splits frontend and backend into git submodules, check the diff inside each one, not just the parent pointer bump. A parent commit that only moves a submodule SHA is not a reviewable diff, go into the submodule and diff there.
 
 ---
 
@@ -55,8 +55,8 @@ git log --oneline main..HEAD
 
 Then find the intent:
 - Linked issue or ticket in the description.
-- Any ADR under `docs/architecture/` that governs this area. If the change contradicts a recorded decision, that is resolved before any code discussion.
-- `CLAUDE.md` and `zpply.md` for the rules this repo already agreed to.
+- Any architecture decision record that governs this area, wherever the project keeps them. If the change contradicts a recorded decision, that is resolved before any code discussion.
+- The project's own instruction and convention docs (`AGENTS.md`, `CLAUDE.md`, a contributing guide) for the rules this repo already agreed to.
 - The files the diff touches, read whole, not just the changed hunks. A diff hunk lies about context.
 
 **Read the surrounding code before judging the new code.** Most bad review comments come from reviewing a hunk in isolation.

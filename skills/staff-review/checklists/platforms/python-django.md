@@ -6,7 +6,7 @@ Framework layer. Sits under `concerns/security.md` and `concerns/performance-bac
 - Idiomatic and consistent with the file it lives in. PEP 8.
 - **No mutable default arguments.** `def f(items=[])` is a defect, not a style preference.
 - Exceptions caught narrowly. A bare `except:` or a broad `except Exception` that swallows is a finding.
-- Type hints accurate and useful, Protocol classes per `user_management/README_TYPES.md`. A wrong hint is worse than none.
+- Type hints accurate and useful. Protocol classes where Django's dynamic attributes defeat the type checker. A wrong hint is worse than none.
 - **Timezone-aware datetimes everywhere.** `datetime.now()` without a timezone is a defect, use `django.utils.timezone`.
 - `Decimal` for money and anywhere float rounding is unsafe.
 - Generators, `iterator()` or streaming for large datasets instead of loading everything into memory.
@@ -42,7 +42,7 @@ Framework layer. Sits under `concerns/security.md` and `concerns/performance-bac
 
 ## APIs and validation
 - All external input validated server side. Serializers, forms or schemas are the single source of validation, not an `if` block in the view.
-- No `/api/` prefix, with the recorded auth-surface exception for `/auth/`, `/account/` and `/o/` per ADR-AUTH-0001.
+- URL shape consistent with the rest of the API. A deviation is a recorded exception in the project's own docs, never a silent one.
 - snake_case JSON, always.
 - Status codes correct: 400 vs 401 vs 403 vs 404 vs 409 vs 422.
 - **PATCH is a partial update, PUT is a full replacement.** A PATCH that nulls unsent fields is a data-loss bug.
@@ -82,6 +82,6 @@ Framework layer. Sits under `concerns/security.md` and `concerns/performance-bac
 - Tasks tested for retry, duplicate delivery and partial failure.
 - External services mocked at the boundary.
 
-## Repo conventions
-- `uv` for dependencies, `requirements.txt` regenerated with `uv export` after any change.
-- `./test_ci_locally.sh` passes.
+## Project conventions
+- Dependency lockfile regenerated and committed after any dependency change, including any generated export the build reads.
+- The project's CI suite passes locally before the review is requested.

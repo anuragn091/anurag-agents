@@ -67,6 +67,6 @@ Framework layer. Sits under `concerns/performance-frontend.md` and `concerns/sec
 - Mocks limited to external boundaries.
 - Critical workflows covered by browser tests.
 
-## Repo conventions
-- Logger per the repo pattern: `createLogger('app/path/to/file.tsx')`.
-- `pnpm lint` and `pnpm type-check` clean.
+## Project conventions
+- Logging follows whatever pattern the project already uses, including its per-file context convention.
+- Lint and type-check clean.

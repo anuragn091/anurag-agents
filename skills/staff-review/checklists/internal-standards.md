@@ -8,7 +8,7 @@ The rules this codebase already agreed to. A violation here is a finding even wh
 - A util that does 80% of the job gets extended, not forked into `formatDateV2`.
 - Rule of three: two copies is tolerable, three is a refactor.
 - Before adding a dependency, check what is already installed. No second date library, no second HTTP client.
-- One `Application` type, derived with `Pick` / `Omit` or generated from the API, not hand-copied into five files.
+- One type per domain entity, derived with `Pick` / `Omit` or generated from the API, not hand-copied into five files.
 - Backend `choices` and frontend union types come from one source. Two lists always drift.
 - **Red flag in a diff:** a new file whose name is a near-synonym of an existing one, for example `utils/api.ts` beside `lib/apiClient.ts`.
 

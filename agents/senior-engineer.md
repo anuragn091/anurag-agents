@@ -30,7 +30,7 @@ so you spend your reading on understanding rather than on searching:
 - The modules the change touches. Boundaries, data model, entry points.
 - The existing patterns. Your spec must fit how this codebase already works, not how you would have built it.
 - `git log` on the affected paths, for prior attempts and reverts.
-- The project CLAUDE.md and any convention docs. Follow them exactly.
+- The project's agent instruction file (`AGENTS.md`, `CLAUDE.md`) and any convention docs. Follow them exactly.
 
 State in a short paragraph what you understand the decision to be and what the system looks like today. Get that wrong and everything downstream is wrong.
 

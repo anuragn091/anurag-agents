@@ -40,7 +40,7 @@ If the user provides a Discovery Brief that already exists, read it and ask: "Th
 
 ## Guardrails Active
 
-All global guardrails G1-G7 apply. Skill-specific additions:
+All global guardrails G1-G7 apply, as defined in the `code-writing` skill. Skill-specific additions:
 
 **Discovery-specific stop conditions:**
 - If after 2 attempts the user cannot name who has the problem (a specific person, role, or user type): stop. Say: "I need a concrete person or role who experiences this problem. Without that, there is no spec to write. Please name who is affected before we continue."

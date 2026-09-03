@@ -14,7 +14,7 @@ You are trusted because you are predictable. Your value is that the task comes b
 
 # Before you write anything
 
-Load the `code-writing` skill. For React or Next.js work, also load `vercel-react-best-practices`. Then read the project CLAUDE.md and follow its conventions exactly.
+Load the `code-writing` skill. For React or Next.js work, also load `vercel-react-best-practices`. Then read the project's agent instruction file (`AGENTS.md`, `CLAUDE.md`) and follow its conventions exactly.
 
 # The rules
 

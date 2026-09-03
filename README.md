@@ -2,28 +2,47 @@
 
 Agent instructions that take a piece of work from a rough idea to a reviewed pull request.
 
-Two halves. **Workflows** define a process and gate it. **Subagents** are the roles that process hands work to, each pinned to a model and restricted to the tools its job actually needs.
+Three parts. **Workflows** define a process and gate it. **Subagents** are the roles that process hands work to, each pinned to a model and restricted to the tools its job needs. **Commands** are the entry points that start a workflow or launch a subagent.
 
 Plain markdown, no framework. Any coding agent that can read a file can use them.
+
+## The pipeline
+
+Each stage consumes the previous stage's document. That is the whole design: nothing starts without its input, and anything ambiguous goes back up a level instead of being guessed at.
+
+```
+rough idea
+  → /discovery          Discovery Brief
+  → /product            PRD                        (runs discovery + requirements)
+  → /principal          decision document, an ADR
+  → /senior             HLD, then LLD
+  → /dispatch           task breakdown, then code  (sde2 dispatches sde1 in waves)
+  → /test-plan          manual test plan
+  → /staff-review       reviewed PR
+```
+
+`/ladder` runs the middle of that chain end to end. `/sdlc` runs all of it.
 
 ## Workflows
 
 In `skills/`. Invoked by name.
 
-| Workflow | Stage | What it does |
+| Workflow | Needs as input | Produces |
 |---|---|---|
-| `discovery` | Product | Turns a vague idea into a structured Discovery Brief |
-| `product-requirements` | Product | Turns a Discovery Brief into a PRD |
-| `product` | Product | Runs discovery then requirements end to end, stops at the PRD |
-| `design-proposal` | Decision | Writes a proposal for team review before a decision is committed |
-| `code-writing` | Implementation | Master instruction loaded before any other coding workflow. Guardrails, stop conditions, tool discipline |
-| `sdlc` | Orchestration | Full lifecycle: requirements, engineering ladder, dev testing, QA, release |
-| `test-plan` | QA | Produces a test plan covering what a human must verify, not what unit tests already cover |
-| `staff-review` | Review | Staff-engineer PR review, layered checklists, P0 to P3 findings |
+| `discovery` | A rough idea | Discovery Brief |
+| `product-requirements` | Discovery Brief | PRD |
+| `product` | A rough idea | PRD, via discovery then requirements |
+| `design-proposal` | An open question with real options | Proposal for team review |
+| `code-writing` | Nothing, it is the base layer | Guardrails every other coding workflow inherits |
+| `sdlc` | Whatever you have | Routes to the right stage, gates each one |
+| `test-plan` | LLD and a task document | Test plan for what a human must verify |
+| `staff-review` | A PR, branch, or diff | Review, findings ranked P0 to P3 |
+
+Workflows that need an input stop and say so rather than inventing one. `/product-requirements` without a Discovery Brief refuses. `/test-plan` without an LLD refuses.
 
 ## The engineering ladder
 
-In `agents/`. Four rungs, dispatched by `sdlc`. Each one is deliberately barred from the rung above and below it, so a decision never gets made inside an implementation and a spec never gets written by the thing building from it.
+In `agents/`. Four rungs, dispatched by the commands below. Each is barred from the rung above and below, so a decision never gets made inside an implementation and a spec never gets written by the thing building from it.
 
 | Subagent | Rung | Owns | Refuses | Model |
 |---|---|---|---|---|
@@ -32,7 +51,22 @@ In `agents/`. Four rungs, dispatched by `sdlc`. Each one is deliberately barred 
 | `sde2-engineer` | SDE-2 | Task breakdown, dispatching juniors in waves, hard implementation | Writing the spec, making the call | sonnet |
 | `sde1-engineer` | SDE-1 | One scoped task with tests, several running in parallel | Migrations, auth, performance, anything with an open decision | sonnet |
 
-Work moves down the ladder: PRD to decision to spec to tasks to code. Anything ambiguous moves back up rather than being guessed at.
+## Commands
+
+In `commands/`. Thin entry points.
+
+| Command | Runs |
+|---|---|
+| `/principal` | principal-engineer, for a decision document |
+| `/senior` | senior-engineer, for an HLD and LLD |
+| `/dispatch` | sde2-engineer, which breaks the spec down and dispatches sde1 agents |
+| `/ladder` | The whole ladder, with an approval gate at every rung |
+| `/add-feature` | Full-stack feature implementation with TDD |
+| `/debug` | Systematic error investigation |
+| `/fix-issue` | Fix a GitHub issue and push |
+| `/fix-tests` | Test repair |
+| `/optimize-performance` | Profiling and optimization pass |
+| `/deploy` | Deployment with safety checks |
 
 ## staff-review
 
@@ -60,48 +94,57 @@ skills/staff-review/
 
 Findings are ranked P0 (security, data loss, outage), P1 (correctness, authorization, compatibility, reliability), P2 (maintainability, performance, architecture), P3, and Nit. A nit never blocks a merge.
 
-## Structure
+## Install
 
+Written for Anthropic's CLI, which auto-loads `~/.claude/skills/`, `~/.claude/agents/` and `~/.claude/commands/`.
+
+```bash
+git clone https://github.com/anuragn091/anurag-agents.git
+cd anurag-agents
+mkdir -p ~/.claude/skills ~/.claude/agents ~/.claude/commands
+cp -R skills/*    ~/.claude/skills/
+cp    agents/*.md ~/.claude/agents/
+cp    commands/*.md ~/.claude/commands/
 ```
-skills/<name>/SKILL.md      a workflow, plus supporting files where the instructions warrant them
-agents/<name>.md            a subagent, one file
+
+Symlink instead if you want `git pull` to update them:
+
+```bash
+for d in skills/*/;   do ln -s "$PWD/$d"  ~/.claude/skills/$(basename "$d"); done
+for f in agents/*.md; do ln -s "$PWD/$f"  ~/.claude/agents/$(basename "$f"); done
+for f in commands/*.md; do ln -s "$PWD/$f" ~/.claude/commands/$(basename "$f"); done
 ```
 
-Both open with YAML frontmatter. A workflow carries its name, a description with trigger phrases, and the tools it may and may not use. A subagent carries its name, a description with worked routing examples, a model pin, and its tool allowlist.
+Restart the CLI. Workflows and commands are then invoked by name: `/staff-review`, `/product`, `/ladder`.
 
-The filenames follow the convention used by Anthropic's CLI, which is where these run today. Nothing in the content depends on them. Any other runtime can read the same files from wherever it expects to find them.
-
-## Use
-
-**Point an agent at the file.** Most tools accept a path or a pasted file:
+**Any other runtime:** copy the file to wherever that tool reads instructions from, or point the agent at the path directly. Nothing in the content depends on the filename.
 
 ```
 Read skills/staff-review/SKILL.md and follow it for this PR.
 ```
 
-**Or install into a runtime that auto-loads instruction directories.** Clone, then symlink what you want:
+## Requirements
 
-```bash
-git clone https://github.com/anuragn091/anurag-agents.git
-cd anurag-agents
-ln -s "$PWD/skills/staff-review" ~/.claude/skills/staff-review
-ln -s "$PWD/agents/principal-engineer.md" ~/.claude/agents/principal-engineer.md
-```
+- A coding agent that can read files, run shell commands, and search a codebase. The workflows name tools (`Read`, `Grep`, `Bash`, `Write`, `WebSearch`) in their `allowed-tools` frontmatter. On a runtime that does not enforce those lists, they are advisory.
+- `gh` CLI, only for `staff-review` posting a review to a pull request and for `/fix-issue`. Everything else works offline.
+- The subagents carry `model: opus` and `model: sonnet` pins. On another runtime, map those to your strongest and mid-tier models, or delete the line.
 
-Symlinking keeps them updatable with a `git pull`. Copying works too:
+## Referenced but not bundled
 
-```bash
-cp -R skills/* ~/.claude/skills/
-cp agents/*.md ~/.claude/agents/
-```
+Some files name workflows that are not in this repo. They degrade to a no-op if missing, except where noted.
 
-Restart your agent. Workflows are invoked by name (`/staff-review`, `/product`, `/test-plan`). Subagents are dispatched by a workflow, or requested directly by role.
+| Referenced | Where | What it is |
+|---|---|---|
+| `vercel-react-best-practices` | `code-writing`, `sde1`, `sde2` | Vercel's React performance skill, published separately under MIT |
+| `web-design-guidelines` | `code-writing` | Vercel's Web Interface Guidelines skill |
+| `code-refactor` | `code-writing` | Not published |
+| `/code-review`, `/security-review` | `sdlc`, `fix-issue` | Built into Anthropic's CLI, absent elsewhere |
 
-For any other runtime, copy the files to wherever that tool reads its instructions from.
+## Adapting to your stack
 
-## A note on the conventions
+The checklists were written against a Next.js and Django codebase, and some lines still assume it: snake_case JSON, service-layer Django, Server Components by default. The technology-agnostic files (`foundation.md`, `internal-standards.md`, everything under `concerns/`) carry no stack assumptions. The platform files under `platforms/` are meant to be edited.
 
-Some checklists name conventions from the codebase they were written against: snake_case JSON, no `/api/` prefix, `uv` for Python dependencies, `pnpm` for the frontend. Adjust those lines to your own stack. Everything else is stack independent.
+Six of the commands (`add-feature`, `debug`, `deploy`, `fix-issue`, `fix-tests`, `optimize-performance`) name Next.js and Django specifics in their prompts. Rewrite those lines or drop the commands.
 
 ## License
 

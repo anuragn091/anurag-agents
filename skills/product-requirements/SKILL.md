@@ -47,7 +47,7 @@ If provided but incomplete (missing problem statement or personas): list exactly
 
 ## Guardrails Active
 
-All global guardrails G1-G7 apply. Skill-specific additions:
+All global guardrails G1-G7 apply, as defined in the `code-writing` skill. Skill-specific additions:
 
 **Vague phrase detector (triggers G2 immediately):**
 If any acceptance criterion contains these words, stop on that criterion before continuing:

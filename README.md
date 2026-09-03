@@ -25,25 +25,27 @@ Restart your agent afterwards, then try `/staff-review`.
 
 ## How the wiring works
 
-`.agents/` holds the real files. Everything else is a symlink pointing at it, so one edit or one `git pull` reaches every agent at once.
+Every directory the installer touches is one an agent actually reads. Nothing is invented.
 
 ```
-.agents/skills/<name>/         read directly by Codex and Cursor
-.agents/agents/<name>.md       our own convention, nothing reads it directly
-.agents/commands/<name>.md     our own convention, nothing reads it directly
+skills
+  .agents/skills/<name>/     canonical    Codex, Cursor
+  .claude/skills/<name>      -> .agents/skills/<name>       Claude Code, Cursor
 
-.claude/skills/<name>    -> .agents/skills/<name>       Claude Code, Cursor
-.claude/agents/<n>.md    -> .agents/agents/<n>.md       Claude Code, Cursor
-.claude/commands/<n>.md  -> .agents/commands/<n>.md     Claude Code
-.cursor/agents/<n>.md    -> .agents/agents/<n>.md       Cursor, wins on name clash
-.codex/agents/<n>.toml                                  Codex, generated not linked
+subagents
+  .claude/agents/<n>.md      canonical    Claude Code, Cursor
+  .cursor/agents/<n>.md      -> .claude/agents/<n>.md       Cursor, wins on name clash
+  .codex/agents/<n>.toml     generated    Codex
+
+commands
+  .claude/commands/<n>.md    canonical    Claude Code
 ```
 
 Two things worth knowing:
 
-**`.agents/` is the skills standard, not a subagent standard.** [The Agent Skills spec](https://agentskills.io) defines `.agents/skills/` and `~/.agents/skills/`, and Codex and Cursor read them. It says nothing about subagents. `.agents/agents/` and `.agents/commands/` are this repo's own idea, kept there so there is one source of truth, with symlinks doing the real work.
+**Skills and subagents have different canonical homes, because the standards differ.** [The Agent Skills spec](https://agentskills.io) defines `.agents/skills/`, and Codex and Cursor read it, so that is where skills live. It says nothing about subagents. There, `.claude/agents/` is the closest thing to a shared path, read by both Claude Code and Cursor, so that is where subagents live.
 
-**Codex subagents are TOML, not markdown.** Codex expects `.codex/agents/<name>.toml` with a `developer_instructions` field, so the same file cannot be symlinked into place. `scripts/codex-agent-from-md.py` generates them from the markdown, and the installer runs it. Re-run the installer after editing a subagent. The `model` pin is dropped on the way, since `opus` and `sonnet` mean nothing to Codex.
+**Codex subagents are TOML, not markdown.** Codex expects `.codex/agents/<name>.toml` with a `developer_instructions` field, so the same file cannot be symlinked into place. `scripts/codex-agent-from-md.py` generates them and the installer runs it. Re-run the installer after editing a subagent. The `model` pin is dropped on the way, since `opus` and `sonnet` mean nothing to Codex.
 
 Where each agent looks:
 

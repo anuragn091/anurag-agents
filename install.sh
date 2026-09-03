@@ -6,15 +6,16 @@
 # .agents/ holds the real files. Every other directory is symlinks pointing at it,
 # so an edit or a git pull reaches every agent at once.
 #
-#   .agents/skills/<name>/        read directly by Codex and Cursor
-#   .agents/agents/<name>.md      our own convention, nothing reads it directly
-#   .agents/commands/<name>.md    our own convention, nothing reads it directly
+# Every directory used here is one an agent actually reads.
 #
-#   .claude/skills/<name>    -> .agents/skills/<name>      Claude Code, Cursor
-#   .claude/agents/<n>.md    -> .agents/agents/<n>.md      Claude Code, Cursor
-#   .claude/commands/<n>.md  -> .agents/commands/<n>.md    Claude Code
-#   .cursor/agents/<n>.md    -> .agents/agents/<n>.md      Cursor, wins on name clash
-#   .codex/agents/<n>.toml                                 Codex, generated not linked
+#   .agents/skills/<name>/      canonical    Codex, Cursor
+#   .claude/skills/<name>       -> .agents/skills/<name>      Claude Code, Cursor
+#
+#   .claude/agents/<n>.md       canonical    Claude Code, Cursor
+#   .cursor/agents/<n>.md       -> .claude/agents/<n>.md      Cursor, wins on name clash
+#   .codex/agents/<n>.toml      generated    Codex
+#
+#   .claude/commands/<n>.md     canonical    Claude Code
 #
 # Codex subagents are TOML with a developer_instructions field, not markdown, so
 # they are generated from the same source rather than symlinked. Re-run this
@@ -248,17 +249,16 @@ fi
 
 # ---- subagents -------------------------------------------------------------
 if wants agents && [ -d "$REPO/agents" ]; then
-  [ $UNINSTALL -eq 0 ] && run mkdir -p "$ROOT/.agents/agents" "$ROOT/.claude/agents" "$ROOT/.cursor/agents" "$ROOT/.codex/agents"
+  [ $UNINSTALL -eq 0 ] && run mkdir -p "$ROOT/.claude/agents" "$ROOT/.cursor/agents" "$ROOT/.codex/agents"
   for src in "$REPO"/agents/*.md; do
     [ -e "$src" ] || continue
     name="$(basename "$src")"
-    canon="$ROOT/.agents/agents/$name"
+    canon="$ROOT/.claude/agents/$name"
     if [ $UNINSTALL -eq 1 ]; then
       remove_generated "$ROOT/.codex/agents/${name%.md}.toml"
-      remove_at "$ROOT/.cursor/agents/$name"; remove_at "$ROOT/.claude/agents/$name"; remove_at "$canon"
+      remove_at "$ROOT/.cursor/agents/$name"; remove_at "$canon"
     else
       install_canonical agent "$src" "$canon" || continue
-      install_alias "$canon" "$ROOT/.claude/agents/$name" || true
       install_alias "$canon" "$ROOT/.cursor/agents/$name" || true
       generate_codex_agent "$src" "$ROOT/.codex/agents/${name%.md}.toml"
       ok "subagent $name"
@@ -268,16 +268,15 @@ fi
 
 # ---- commands --------------------------------------------------------------
 if wants commands && [ -d "$REPO/commands" ]; then
-  [ $UNINSTALL -eq 0 ] && run mkdir -p "$ROOT/.agents/commands" "$ROOT/.claude/commands"
+  [ $UNINSTALL -eq 0 ] && run mkdir -p "$ROOT/.claude/commands"
   for src in "$REPO"/commands/*.md; do
     [ -e "$src" ] || continue
     name="$(basename "$src")"
-    canon="$ROOT/.agents/commands/$name"
+    canon="$ROOT/.claude/commands/$name"
     if [ $UNINSTALL -eq 1 ]; then
-      remove_at "$ROOT/.claude/commands/$name"; remove_at "$canon"
+      remove_at "$canon"
     else
       install_canonical command "$src" "$canon" || continue
-      install_alias "$canon" "$ROOT/.claude/commands/$name" || true
       ok "command  $name"
     fi
   done
@@ -291,16 +290,17 @@ else
   say "${C_B}Linked $CREATED entries.${C_0}"
   [ $SKIPPED -gt 0 ] && warn "$SKIPPED skipped because something real was already there."
   say ""
-  say "  Codex and Cursor read   $(short "$ROOT")/.agents/skills"
-  say "  Claude Code reads       $(short "$ROOT")/.claude/skills, .claude/agents, .claude/commands"
-  say "  Cursor reads subagents  $(short "$ROOT")/.cursor/agents"
-  say "  Codex reads subagents   $(short "$ROOT")/.codex/agents  ${C_DIM}(generated TOML)${C_0}"
+  say "  skills     $(short "$ROOT")/.agents/skills   ${C_DIM}Codex, Cursor${C_0}"
+  say "             $(short "$ROOT")/.claude/skills   ${C_DIM}Claude Code, Cursor${C_0}"
+  say "  subagents  $(short "$ROOT")/.claude/agents   ${C_DIM}Claude Code, Cursor${C_0}"
+  say "             $(short "$ROOT")/.cursor/agents   ${C_DIM}Cursor${C_0}"
+  say "             $(short "$ROOT")/.codex/agents    ${C_DIM}Codex, generated TOML${C_0}"
+  say "  commands   $(short "$ROOT")/.claude/commands ${C_DIM}Claude Code${C_0}"
   say ""
   say "Restart your agent, then try ${C_B}/staff-review${C_0}."
   if [ "$SCOPE" = "project" ]; then
     say ""
-    info "Commit .agents/ and leave the symlinked directories out of git, or commit them too"
-    info "if you want teammates on other agents to get them without running this script."
+    info "Commit these directories if you want teammates to get them without running this script."
   fi
 fi
 say ""

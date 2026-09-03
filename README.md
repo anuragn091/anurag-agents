@@ -1,59 +1,59 @@
 # anurag-agents
 
-Skills, subagents and commands that take a piece of work from a rough idea to a reviewed pull request. They run in Claude Code, Codex and Cursor from one set of files.
+Skills and subagents that take a piece of work from a rough idea to a reviewed pull request. One set of files, read by Claude Code, Codex and Cursor.
 
 ## Install
 
+Copy the four directories. That is the whole install.
+
 ```bash
 git clone https://github.com/anuragn091/anurag-agents.git
-cd anurag-agents
-./install.sh
+cp -R anurag-agents/.agents anurag-agents/.claude anurag-agents/.codex ~/
 ```
 
-It asks two questions: install for your user or for one project, and link to this clone or copy the files. Then it wires up every agent.
+Swap `~/` for a project path to install there instead, and commit them so the team and any cloud agent get them too. Restart your agent, then try `/staff-review`.
+
+Every file is a real file. No symlinks, so this works on Windows and from a zip download.
+
+Use `./install.sh` instead when you want the parts a copy cannot do: merging into directories that already hold your own skills, being told what changed, and `--uninstall`. It refuses to overwrite anything that differs from what this repo ships unless you pass `--force`.
 
 ```bash
-./install.sh --user                 # into $HOME, available in every project
-./install.sh --project ~/code/app   # into one repo, commit it for the team
-./install.sh --copy                 # independent of this clone
-./install.sh --only skills          # skills, agents or commands. repeatable
-./install.sh --dry-run --user       # print what it would do
-./install.sh --uninstall --user     # remove what it created
+./install.sh                    # asks user or project
+./install.sh --user
+./install.sh --project ~/code/app
+./install.sh --only skills
+./install.sh --dry-run --user
+./install.sh --uninstall --user
 ```
 
-Restart your agent afterwards, then try `/staff-review`.
+## Layout
 
-## How the wiring works
-
-Every directory the installer touches is one an agent actually reads. Nothing is invented.
+Every directory here is one an agent actually reads.
 
 ```
-skills
-  .agents/skills/<name>/     canonical    Codex, Cursor
-  .claude/skills/<name>      -> .agents/skills/<name>       Claude Code, Cursor
-
-subagents
-  .claude/agents/<n>.md      canonical    Claude Code, Cursor
-  .cursor/agents/<n>.md      -> .claude/agents/<n>.md       Cursor, wins on name clash
-  .codex/agents/<n>.toml     generated    Codex
-
-commands
-  .claude/commands/<n>.md    canonical    Claude Code
+.agents/skills/<name>/SKILL.md     source        Codex, Cursor
+.claude/skills/<name>/SKILL.md     mirror        Claude Code, Cursor
+.claude/agents/<name>.md           source        Claude Code, Cursor
+.codex/agents/<name>.toml          generated     Codex
 ```
-
-Two things worth knowing:
-
-**Skills and subagents have different canonical homes, because the standards differ.** [The Agent Skills spec](https://agentskills.io) defines `.agents/skills/`, and Codex and Cursor read it, so that is where skills live. It says nothing about subagents. There, `.claude/agents/` is the closest thing to a shared path, read by both Claude Code and Cursor, so that is where subagents live.
-
-**Codex subagents are TOML, not markdown.** Codex expects `.codex/agents/<name>.toml` with a `developer_instructions` field, so the same file cannot be symlinked into place. `scripts/codex-agent-from-md.py` generates them and the installer runs it. Re-run the installer after editing a subagent. The `model` pin is dropped on the way, since `opus` and `sonnet` mean nothing to Codex.
-
-Where each agent looks:
 
 | | Skills | Subagents |
 |---|---|---|
 | Claude Code | `.claude/skills`, `~/.claude/skills` | `.claude/agents`, `~/.claude/agents` |
-| Codex | `.agents/skills`, `~/.agents/skills` | `.codex/agents`, `~/.codex/agents` (TOML) |
-| Cursor | `.agents/skills`, `.cursor/skills`, `.claude/skills`, `.codex/skills` | `.cursor/agents`, `.claude/agents`, `.codex/agents` |
+| Codex | `.agents/skills`, `~/.agents/skills` | `.codex/agents`, `~/.codex/agents` |
+| Cursor | `.agents/skills`, `.claude/skills`, `.cursor/skills`, `.codex/skills` | `.cursor/agents`, `.claude/agents`, `.codex/agents` |
+
+Two things are derived rather than written by hand:
+
+**`.claude/skills/` is a byte-identical copy of `.agents/skills/`.** No tool reads both paths, and git checks a symlink out as a plain text file on Windows without Developer Mode, so the files are duplicated instead. CI fails any commit where the two differ.
+
+**`.codex/agents/*.toml` is generated from `.claude/agents/*.md`.** Codex reads TOML with a `developer_instructions` field, not markdown, so the same file cannot serve both. The `model` pin is dropped on the way, since `opus` and `sonnet` mean nothing to Codex.
+
+After editing either source, run:
+
+```bash
+./scripts/sync.sh
+```
 
 ## The pipeline
 
@@ -74,18 +74,32 @@ rough idea
 
 ## Skills
 
+Eighteen, invoked by name.
+
 | Skill | Needs as input | Produces |
 |---|---|---|
 | `discovery` | A rough idea | Discovery Brief |
 | `product-requirements` | Discovery Brief | PRD |
 | `product` | A rough idea | PRD, via discovery then requirements |
 | `design-proposal` | An open question with real options | Proposal for team review |
+| `principal` | A PRD | Decision document, what won and what it costs |
+| `senior` | A decision document | HLD, then LLD |
+| `dispatch` | An LLD or a task document | Task breakdown, then code |
+| `ladder` | Whatever you have | The whole ladder with a gate at every rung |
+| `sdlc` | Whatever you have | Full lifecycle, requirements through release |
 | `code-writing` | Nothing, it is the base layer | Guardrails every other coding skill inherits |
-| `sdlc` | Whatever you have | Routes to the right stage, gates each one |
 | `test-plan` | LLD and a task document | Test plan for what a human must verify |
 | `staff-review` | A PR, branch, or diff | Review, findings ranked P0 to P3 |
+| `add-feature` | A feature description | Implementation with tests |
+| `debug` | An error or stack trace | Root cause and a fix |
+| `fix-tests` | A failing suite | Repaired tests |
+| `fix-issue` | A GitHub issue number | A fix, committed and pushed |
+| `optimize-performance` | A slow path | Profiling and an optimization pass |
+| `deploy` | A release | Deployment with safety checks |
 
 A skill that needs an input stops and says so rather than inventing one. `/product-requirements` without a Discovery Brief refuses. `/test-plan` without an LLD refuses.
+
+`deploy` and `fix-issue` carry `disable-model-invocation: true`, so only you can start them. They ship to production and push to GitHub. The rest can be invoked by name or picked up by the agent when relevant.
 
 ## Subagents
 
@@ -98,20 +112,16 @@ Four rungs. Each is barred from the rung above and below, so a decision never ge
 | `sde2-engineer` | Task breakdown, dispatching juniors in waves, hard implementation | Writing the spec, making the call | sonnet |
 | `sde1-engineer` | One scoped task with tests, several running in parallel | Migrations, auth, performance, anything with an open decision | sonnet |
 
-## Commands
-
-`/principal`, `/senior`, `/dispatch` and `/ladder` drive the subagents above. `/add-feature`, `/debug`, `/fix-issue`, `/fix-tests`, `/optimize-performance` and `/deploy` are standalone.
-
-Claude Code has merged commands into skills, so a file in `.claude/commands/` and a skill of the same name both create the same slash command.
+`sde1-engineer` has no `Agent` tool, so it cannot spawn anything. The other three can.
 
 ## staff-review
 
-The largest of the skills. It reviews a PR the way a staff engineer does, and it cannot edit code: `Write` and `Edit` are in `forbidden-tools`, so a review never quietly becomes a commit.
+The largest of the skills. It reviews a PR the way a staff engineer does. `disallowed-tools` removes `Write`, `Edit` and `NotebookEdit`, so in Claude Code a review cannot quietly become a commit.
 
 Checklists are layered. Concerns are technology agnostic and own the question. Platform files sit underneath and show how that question is answered in a given stack.
 
 ```
-skills/staff-review/
+.agents/skills/staff-review/
 ├── SKILL.md                         workflow, priorities, output format
 └── checklists/
     ├── foundation.md                14 universal review areas
@@ -130,12 +140,26 @@ skills/staff-review/
 
 Findings are ranked P0 (security, data loss, outage), P1 (correctness, authorization, compatibility, reliability), P2 (maintainability, performance, architecture), P3, and Nit. A nit never blocks a merge.
 
+## What is enforced where
+
+Instructions are instructions everywhere. Only some of them are backed by the runtime.
+
+| | Claude Code | Cursor | Codex |
+|---|---|---|---|
+| Skill discovery and invocation | yes | yes | yes |
+| Subagents load | yes | yes | yes, as TOML |
+| `disallowed-tools` on a skill | **enforced** | no such field | no such field |
+| `tools` on a subagent | **enforced** | ignored | dropped by the generator |
+| `disable-model-invocation` | yes | yes | unverified |
+| `model` pin | yes | passed through | dropped |
+
+Where a column says no, the rule still holds because the instruction text says so. It is just not a hard stop.
+
 ## Requirements
 
 - An agent that can read files, run shell commands and search a codebase.
-- `python3`, only for generating the Codex TOML files. Without it the installer skips them and says so.
-- `gh` CLI, only for `staff-review` posting to a pull request and for `/fix-issue`.
-- The subagent `model: opus` and `model: sonnet` pins are Anthropic model names. Cursor accepts a `model` field and will use its own; Codex ignores the pin entirely because the generator drops it.
+- `python3`, only for `./scripts/sync.sh`. Not needed to install.
+- `gh` CLI, only for `staff-review` posting to a pull request and for `fix-issue`.
 
 ## Referenced but not bundled
 
@@ -148,11 +172,22 @@ Some files name skills that are not in this repo. They degrade to a no-op if mis
 | `code-refactor` | `code-writing` | Not published |
 | `/code-review`, `/security-review` | `sdlc`, `fix-issue` | Built into Claude Code, absent elsewhere |
 
+## Contributing
+
+Edit `.agents/skills/` or `.claude/agents/`, never the derived copies. Then:
+
+```bash
+./scripts/sync.sh          # rebuild .claude/skills and .codex/agents
+python3 scripts/validate.py
+```
+
+CI runs `./scripts/sync.sh --check` and `validate.py` on every pull request, so a change that edits one copy and not the other cannot merge.
+
 ## Adapting to your stack
 
-The review checklists were written against a Next.js and Django codebase, and some lines still assume it: snake_case JSON, service-layer Django, Server Components by default. The technology-agnostic files (`foundation.md`, `internal-standards.md`, everything under `concerns/`) carry no stack assumptions. The files under `platforms/` are meant to be edited.
+The review checklists were written against a Next.js and Django codebase, and some lines still assume it. The technology-agnostic files (`foundation.md`, `internal-standards.md`, everything under `concerns/`) carry no stack assumptions. The files under `platforms/` are meant to be edited.
 
-Six of the commands (`add-feature`, `debug`, `deploy`, `fix-issue`, `fix-tests`, `optimize-performance`) name Next.js and Django specifics in their prompts. Rewrite those lines or drop the commands.
+Six of the skills (`add-feature`, `debug`, `deploy`, `fix-issue`, `fix-tests`, `optimize-performance`) name Next.js and Django specifics in their prompts. Rewrite those lines or delete the skills.
 
 ## License
 

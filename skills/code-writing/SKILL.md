@@ -1,6 +1,6 @@
 ---
 name: code-writing
-description: Master agent for writing any code. TRIGGER - load this FIRST before any other agent or action when the task involves writing, editing, or implementing code. All other coding agents (vercel-react-best-practices, web-design-guidelines, debug, add-feature, code-refactor, etc.) apply on top of this foundation. Never skip this agent for implementation tasks.
+description: Master skill for writing any code. TRIGGER - load this FIRST before any other skill or action when the task involves writing, editing, or implementing code. All other coding skills (vercel-react-best-practices, web-design-guidelines, debug, add-feature, code-refactor, etc.) apply on top of this foundation. Never skip this skill for implementation tasks.
 metadata:
   author: anurag
   version: "2.0.0"
@@ -16,13 +16,13 @@ metadata:
     - Figma
     - Jira
     - Linear
-    - Gmail
-    - Calendar
+    - mcp__claude_ai_Gmail
+    - mcp__claude_ai_Google_Calendar
 ---
 
-# Code Writing - Master Agent
+# Code Writing - Master Skill
 
-Foundational agent for all code writing. Load before any framework-specific or task-specific agent. Other agents extend these principles; they do not replace them.
+Foundational skill for all code writing. Load before any framework-specific or task-specific skill. Other skills extend these principles; they do not replace them.
 
 ---
 

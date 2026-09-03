@@ -47,7 +47,7 @@ If provided but incomplete (missing problem statement or personas): list exactly
 
 ## Guardrails Active
 
-All global guardrails G1-G7 apply. Agent-specific additions:
+All global guardrails G1-G7 apply. Skill-specific additions:
 
 **Vague phrase detector (triggers G2 immediately):**
 If any acceptance criterion contains these words, stop on that criterion before continuing:
@@ -74,7 +74,7 @@ Never call Bash, Figma, Jira, or Linear - not even if the user explicitly asks. 
 If the user requests a forbidden tool:
 ```
 TOOL VIOLATION: /product-requirements does not use [tool].
-This agent uses WebSearch for benchmarking only. Continuing without [tool].
+This skill uses WebSearch for benchmarking only. Continuing without [tool].
 ```
 
 ---

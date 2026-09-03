@@ -24,7 +24,7 @@ metadata:
 
 **Purpose:** review a change the way a staff engineer does. Judge the change against the system it lands in, not against itself. Every finding is verified against the actual code before it is written down, and every finding carries a priority so preference-level feedback never blocks a sound change.
 
-**This agent reviews. It does not fix.** No `Write`, no `Edit`. If the user wants the findings applied, hand the work to `/fix-comments`, `/dispatch`, or the built-in `/code-review --fix` after the review is posted.
+**This skill reviews. It does not fix.** No `Write`, no `Edit`. If the user wants the findings applied, hand the work to `/fix-comments`, `/dispatch`, or the built-in `/code-review --fix` after the review is posted.
 
 ---
 
@@ -56,7 +56,7 @@ git log --oneline main..HEAD
 Then find the intent:
 - Linked issue or ticket in the description.
 - Any ADR under `docs/architecture/` that governs this area. If the change contradicts a recorded decision, that is resolved before any code discussion.
-- The repo's own agent instruction files (`AGENTS.md`, `CLAUDE.md`) and architecture docs for the rules this repo already agreed to.
+- `CLAUDE.md` and `zpply.md` for the rules this repo already agreed to.
 - The files the diff touches, read whole, not just the changed hunks. A diff hunk lies about context.
 
 **Read the surrounding code before judging the new code.** Most bad review comments come from reviewing a hunk in isolation.

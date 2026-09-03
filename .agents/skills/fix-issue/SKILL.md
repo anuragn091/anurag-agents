@@ -1,5 +1,10 @@
 ---
+name: fix-issue
 description: Fix GitHub issue with optimized Next.js/TypeScript code and auto-push to GitHub
+disable-model-invocation: true
+metadata:
+  author: anurag
+  version: "1.0.0"
 ---
 
 I'll fix GitHub issue #{issue_number} with enterprise-grade Next.js/TypeScript implementation:

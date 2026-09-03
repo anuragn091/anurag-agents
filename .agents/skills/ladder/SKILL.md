@@ -1,5 +1,9 @@
 ---
+name: ladder
 description: The engineering ladder. PRD in, working code out. principal-engineer decides, senior-engineer specs, sde2-engineer breaks down and dispatches, sde1-engineer implements. Starts at whichever rung your input lands on, with an approval gate at every step.
+metadata:
+  author: anurag
+  version: "1.0.0"
 ---
 
 Input: $ARGUMENTS

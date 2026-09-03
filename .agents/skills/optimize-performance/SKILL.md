@@ -1,5 +1,9 @@
 ---
+name: optimize-performance
 description: Application performance optimization with profiling, caching, and framework-specific techniques
+metadata:
+  author: anurag
+  version: "1.0.0"
 ---
 
 I'll optimize application performance with enterprise-grade techniques:

@@ -1,5 +1,9 @@
 ---
+name: senior
 description: Senior engineer, SDE-3. Decision doc in, HLD and LLD out, detailed enough for a junior to build from without inventing anything. Use for "write the spec", "tech spec for X", "low level design". Runs the senior-engineer agent on Opus 5. Specs, never codes.
+metadata:
+  author: anurag
+  version: "1.0.0"
 ---
 
 Spec target: $ARGUMENTS

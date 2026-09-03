@@ -1,5 +1,9 @@
 ---
+name: dispatch
 description: SDE-2 and SDE-1. Task document in, working code and tests out. SDE-2 dispatches junior agents in waves and checkpoints every result to disk, so a crashed or interrupted run resumes instead of restarting.
+metadata:
+  author: anurag
+  version: "1.0.0"
 ---
 
 Task document: $ARGUMENTS

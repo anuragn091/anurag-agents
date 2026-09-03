@@ -1,5 +1,9 @@
 ---
+name: debug
 description: Systematic error investigation and debugging with framework-agnostic approach
+metadata:
+  author: anurag
+  version: "1.0.0"
 ---
 
 I'll systematically debug this error with enterprise-grade investigation:

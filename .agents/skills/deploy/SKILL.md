@@ -1,5 +1,10 @@
 ---
+name: deploy
 description: Enterprise-grade Next.js deployment with comprehensive safety checks
+disable-model-invocation: true
+metadata:
+  author: anurag
+  version: "1.0.0"
 ---
 
 I'll deploy the Next.js application with enterprise safety protocols:

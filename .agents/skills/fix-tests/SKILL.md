@@ -1,5 +1,9 @@
 ---
+name: fix-tests
 description: TDD-focused Next.js/React test fixing with comprehensive coverage
+metadata:
+  author: anurag
+  version: "1.0.0"
 ---
 
 I'll fix React/Next.js tests using rigorous Test-Driven Development approach:

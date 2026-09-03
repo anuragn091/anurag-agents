@@ -1,5 +1,9 @@
 ---
+name: add-feature
 description: Full-stack feature implementation with TDD, framework best practices, and GitHub integration
+metadata:
+  author: anurag
+  version: "1.0.0"
 ---
 
 I'll implement this feature using enterprise development practices:

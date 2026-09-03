@@ -1,5 +1,9 @@
 ---
+name: principal
 description: Principal engineer. PRD in, decision document out: what we chose, why it won, what we gave up, and what should make us revisit. Interrogates you for constraints first. Runs the principal-engineer agent on Opus 5. Decides, never codes.
+metadata:
+  author: anurag
+  version: "1.0.0"
 ---
 
 Decision topic: $ARGUMENTS

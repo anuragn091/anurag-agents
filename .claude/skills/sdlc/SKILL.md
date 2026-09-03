@@ -23,7 +23,7 @@ This skill routes and gates. It does not produce documents or code itself.
 | 5 | Build | `/dispatch` → `sde2-engineer` + `sde1-engineer` | code, unit tests |
 | 6a | Dev testing | this skill | green suite, reviewed diff |
 | 6b | QA testing | `/test-plan` | test results, exit criteria met |
-| 7 | Release | `/deploy` | shipped |
+| 7 | Release | the project's own process | shipped |
 
 Stages 2 to 5 are the engineering ladder. Each rung runs on its own model tier.
 
@@ -80,7 +80,7 @@ The tests written during stage 5 prove each unit works. This stage proves the sy
 2. Run the linter and the type checker. Both must be clean.
 3. Check coverage on the changed paths only. A global percentage tells you nothing useful.
 4. Find what the unit tests missed: the seams between tasks, the paths that cross two agents' work, the error branches nobody exercised.
-5. On failures, run `/fix-tests`. Fix the code when the code is wrong. Fix the test when the test is wrong. Never delete a failing test to get green.
+5. On failures, fix the code when the code is wrong and the test when the test is wrong. Never delete a failing test to get green. Two failed attempts on the same failure is a stop, not a third attempt.
 6. Run `/code-review` on the full diff.
 7. Run `/security-review` if the change touches auth, user input, file upload, external calls, or personal data.
 
@@ -104,7 +104,7 @@ Then execute it:
 
 ## Stage 7: Release
 
-Run `/deploy`.
+Release is the project's own process, not this skill's. Hand over the merged change, the test plan result, and the rollback path, then stop.
 
 Before it runs, confirm out loud:
 - The suite is green and the diff is reviewed

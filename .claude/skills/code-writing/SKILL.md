@@ -1,6 +1,6 @@
 ---
 name: code-writing
-description: Master skill for writing any code. TRIGGER - load this FIRST before any other skill or action when the task involves writing, editing, or implementing code. All other coding skills (vercel-react-best-practices, web-design-guidelines, debug, add-feature, code-refactor, etc.) apply on top of this foundation. Never skip this skill for implementation tasks.
+description: Master skill for writing any code. TRIGGER - load this FIRST before any other skill or action when the task involves writing, editing, or implementing code. Every other coding skill applies on top of this foundation, never in place of it. Never skip this skill for implementation tasks.
 metadata:
   author: anurag
   version: "2.0.0"

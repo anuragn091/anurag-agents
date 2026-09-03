@@ -74,7 +74,7 @@ rough idea
 
 ## Skills
 
-Eighteen, invoked by name.
+Twelve, invoked by name.
 
 | Skill | Needs as input | Produces |
 |---|---|---|
@@ -90,16 +90,10 @@ Eighteen, invoked by name.
 | `code-writing` | Nothing, it is the base layer | Guardrails every other coding skill inherits |
 | `test-plan` | LLD and a task document | Test plan for what a human must verify |
 | `staff-review` | A PR, branch, or diff | Review, findings ranked P0 to P3 |
-| `add-feature` | A feature description | Implementation with tests |
-| `debug` | An error or stack trace | Root cause and a fix |
-| `fix-tests` | A failing suite | Repaired tests |
-| `fix-issue` | A GitHub issue number | A fix, committed and pushed |
-| `optimize-performance` | A slow path | Profiling and an optimization pass |
-| `deploy` | A release | Deployment with safety checks |
 
 A skill that needs an input stops and says so rather than inventing one. `/product-requirements` without a Discovery Brief refuses. `/test-plan` without an LLD refuses.
 
-`deploy` and `fix-issue` carry `disable-model-invocation: true`, so only you can start them. They ship to production and push to GitHub. The rest can be invoked by name or picked up by the agent when relevant.
+Every skill here can be invoked by name or picked up by the agent when the description matches. None of them deploy, push, or touch anything outside the repository on their own.
 
 ## Subagents
 
@@ -159,7 +153,7 @@ Where a column says no, the rule still holds because the instruction text says s
 
 - An agent that can read files, run shell commands and search a codebase.
 - `python3`, only for `./scripts/sync.sh`. Not needed to install.
-- `gh` CLI, only for `staff-review` posting to a pull request and for `fix-issue`.
+- `gh` CLI, only for `staff-review` posting a review to a pull request.
 
 ## Referenced but not bundled
 
@@ -170,7 +164,7 @@ Some files name skills that are not in this repo. They degrade to a no-op if mis
 | `vercel-react-best-practices` | `code-writing`, `sde1`, `sde2` | Vercel's React performance skill, published separately under MIT |
 | `web-design-guidelines` | `code-writing` | Vercel's Web Interface Guidelines skill |
 | `code-refactor` | `code-writing` | Not published |
-| `/code-review`, `/security-review` | `sdlc`, `fix-issue` | Built into Claude Code, absent elsewhere |
+| `/code-review`, `/security-review` | `sdlc` | Built into Claude Code, absent elsewhere |
 
 ## Contributing
 
@@ -187,7 +181,7 @@ CI runs `./scripts/sync.sh --check` and `validate.py` on every pull request, so 
 
 The review checklists were written against a Next.js and Django codebase, and some lines still assume it. The technology-agnostic files (`foundation.md`, `internal-standards.md`, everything under `concerns/`) carry no stack assumptions. The files under `platforms/` are meant to be edited.
 
-Six of the skills (`add-feature`, `debug`, `deploy`, `fix-issue`, `fix-tests`, `optimize-performance`) name Next.js and Django specifics in their prompts. Rewrite those lines or delete the skills.
+Everything else is stack independent. Nothing here runs a build, a test command, or a deploy, so there is no tooling to swap out.
 
 ## License
 

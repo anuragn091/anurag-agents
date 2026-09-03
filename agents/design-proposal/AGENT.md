@@ -47,7 +47,7 @@ Design Proposals that present a forgone conclusion produce low-quality feedback.
 
 ## Guardrails Active
 
-All global guardrails G1-G7 apply. Skill-specific additions:
+All global guardrails G1-G7 apply. Agent-specific additions:
 
 **Unresolved Questions is mandatory and must not be empty:**
 If the Unresolved Questions section is empty or the user tries to finalize without it:
@@ -90,7 +90,7 @@ Never call Bash, Figma, Jira, or Linear - not even if the user asks. The `forbid
 If the user requests a forbidden tool:
 ```
 TOOL VIOLATION: /design-proposal does not use [tool].
-This skill uses WebSearch for research only. Continuing without [tool].
+This agent uses WebSearch for research only. Continuing without [tool].
 ```
 
 ---

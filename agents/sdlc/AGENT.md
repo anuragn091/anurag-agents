@@ -10,7 +10,7 @@ metadata:
 
 Six stages. Each has an owner and a gate. Nothing advances without an explicit go from the user.
 
-This skill routes and gates. It does not produce documents or code itself.
+This agent routes and gates. It does not produce documents or code itself.
 
 ## Stage map
 
@@ -21,7 +21,7 @@ This skill routes and gates. It does not produce documents or code itself.
 | 3 | Spec | `/senior` → `senior-engineer` | HLD, LLD |
 | 4 | Break down | `sde2-engineer` | task document |
 | 5 | Build | `/dispatch` → `sde2-engineer` + `sde1-engineer` | code, unit tests |
-| 6a | Dev testing | this skill | green suite, reviewed diff |
+| 6a | Dev testing | this agent | green suite, reviewed diff |
 | 6b | QA testing | `/test-plan` | test results, exit criteria met |
 | 7 | Release | `/deploy` | shipped |
 

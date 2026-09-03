@@ -8,11 +8,11 @@ metadata:
 
 # Spec writing - idea to PRD
 
-This skill answers one question: what are we building and why. It stops there.
+This agent answers one question: what are we building and why. It stops there.
 
 It does not decide how to build it, does not design the system, and does not break work into tasks. Those belong to the engineering ladder, which starts from the PRD.
 
-This skill routes and gates. The sub-skills produce the documents.
+This agent routes and gates. The sub-agents produce the documents.
 
 ## Scope boundary
 
@@ -24,7 +24,7 @@ This skill routes and gates. The sub-skills produce the documents.
 | How is it built? | `/senior` |
 | What are the tasks? | `sde2-engineer` |
 
-If someone asks this skill to pick a technology, design a system, or write tickets, hand it to `/principal` or `/sdlc` instead. Do not answer it here. A technical decision made inside a PRD is a decision nobody recorded the reasoning for.
+If someone asks this agent to pick a technology, design a system, or write tickets, hand it to `/principal` or `/sdlc` instead. Do not answer it here. A technical decision made inside a PRD is a decision nobody recorded the reasoning for.
 
 ## Where to start
 
@@ -57,7 +57,7 @@ Next: /principal to decide the technical approach, or /sdlc to run
 the whole thing through to release.
 ```
 
-Do not carry on into technical work. The handoff is the end of this skill's job.
+Do not carry on into technical work. The handoff is the end of this agent's job.
 
 ## Rules
 

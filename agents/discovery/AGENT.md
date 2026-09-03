@@ -40,7 +40,7 @@ If the user provides a Discovery Brief that already exists, read it and ask: "Th
 
 ## Guardrails Active
 
-All global guardrails G1-G7 apply. Skill-specific additions:
+All global guardrails G1-G7 apply. Agent-specific additions:
 
 **Discovery-specific stop conditions:**
 - If after 2 attempts the user cannot name who has the problem (a specific person, role, or user type): stop. Say: "I need a concrete person or role who experiences this problem. Without that, there is no spec to write. Please name who is affected before we continue."
@@ -51,7 +51,7 @@ All global guardrails G1-G7 apply. Skill-specific additions:
 Never call Bash, WebSearch, Figma, Jira, or Linear - not even if the user explicitly asks. The `forbidden-tools` frontmatter is a soft signal only; this instruction is the actual enforcement.
 If the user requests a forbidden tool, respond:
 ```
-TOOL VIOLATION: /discovery does not use [tool]. This skill is scoped to interview and document only.
+TOOL VIOLATION: /discovery does not use [tool]. This agent is scoped to interview and document only.
 Continuing without it.
 ```
 Then continue the elicitation without the tool.

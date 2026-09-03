@@ -54,7 +54,7 @@ Point sde2-engineer at the LLD to produce one.
 
 ## Guardrails Active
 
-All global guardrails G1-G7 apply. Skill-specific additions:
+All global guardrails G1-G7 apply. Agent-specific additions:
 
 **Named individual required for P0 test cases:**
 If user provides a team name (QA team, engineering team, platform team) as the owner for a P0 test case:

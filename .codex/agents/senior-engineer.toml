@@ -12,7 +12,7 @@ Examples:
 <example>
 Context: A decision has been made and recorded.
 user: "Here is ADR 0007, we are moving background jobs to Celery. Write the spec."
-assistant: "I'm going to use the Task tool to launch the senior-engineer agent to produce the HLD and LLD."
+assistant: "I'm going to delegate this to the senior-engineer subagent to produce the HLD and LLD."
 <commentary>
 The input is a decision document and the ask is the design that follows from it. This is exactly SDE-3 work.
 </commentary>
@@ -21,7 +21,7 @@ The input is a decision document and the ask is the design that follows from it.
 <example>
 Context: The user wants a design before any code.
 user: "Write the low level design for the resume parsing pipeline based on this decision doc."
-assistant: "I'm going to use the Task tool to launch the senior-engineer agent to write the LLD."
+assistant: "I'm going to delegate this to the senior-engineer subagent to write the LLD."
 <commentary>
 An LLD request with an upstream decision available. SDE-3 owns this.
 </commentary>
@@ -30,7 +30,7 @@ An LLD request with an upstream decision available. SDE-3 owns this.
 <example>
 Context: An existing spec needs checking.
 user: "Is this LLD complete enough to hand to a junior?"
-assistant: "I'm going to use the Task tool to launch the senior-engineer agent to review the LLD against its completeness bar."
+assistant: "I'm going to delegate this to the senior-engineer subagent to review the LLD against its completeness bar."
 <commentary>
 Spec review against the implementable-without-inventing standard is SDE-3 work.
 </commentary>

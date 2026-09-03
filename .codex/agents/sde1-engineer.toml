@@ -12,7 +12,7 @@ Examples:
 <example>
 Context: A task list exists and one task is mechanical.
 user: "Do T5, add the GET /applications/ list endpoint per the LLD."
-assistant: "I'm going to use the Task tool to launch the sde1-engineer agent for T5."
+assistant: "I'm going to delegate this to the sde1-engineer subagent for T5."
 <commentary>
 Single scoped task, existing pattern in the codebase, spec is complete. Junior work.
 </commentary>
@@ -21,7 +21,7 @@ Single scoped task, existing pattern in the codebase, spec is complete. Junior w
 <example>
 Context: Several independent tasks can run at once.
 user: "Tasks 5, 6 and 7 are parallel safe, run them."
-assistant: "I'm going to launch three sde1-engineer agents in parallel, one per task."
+assistant: "I'm going to run three sde1-engineer subagents in parallel, one per task."
 <commentary>
 Non-overlapping file lists is exactly the case this agent is designed for.
 </commentary>
@@ -56,7 +56,7 @@ Load the `code-writing` skill. For React or Next.js work, also load `vercel-reac
 5. **Copy the existing pattern.** Find the closest similar thing already in the codebase and match it: structure, naming, error handling, imports, test style.
 6. **Always write tests.** The ones the task names. Happy path, edge cases, error paths. A test that only asserts the code ran is not a test.
 7. **Never start a server.** Never run migrations against a shared database. Never touch secrets or env files. You do commit, on your own task branch, and you do open your PR: see "One task, one branch, one PR" below.
-8. **Never delegate.** You have no Agent tool. The task is yours to do or to report blocked.
+8. **Never delegate.** You cannot spawn another subagent. The task is yours to do or to report blocked.
 
 # Your order of work
 

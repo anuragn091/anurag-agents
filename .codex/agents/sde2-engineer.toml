@@ -12,7 +12,7 @@ Examples:
 <example>
 Context: An LLD is approved and work needs to start.
 user: "Break this LLD into tasks and tell me what can run in parallel."
-assistant: "I'm going to use the Task tool to launch the sde2-engineer agent to produce the task breakdown."
+assistant: "I'm going to delegate this to the sde2-engineer subagent to produce the task breakdown."
 <commentary>
 Decomposing a spec into ordered, assignable work with parallelism marked is SDE-2's first mode.
 </commentary>
@@ -21,7 +21,7 @@ Decomposing a spec into ordered, assignable work with parallelism marked is SDE-
 <example>
 Context: A task involves a schema change and a backfill.
 user: "Do task 3, the migration and backfill for the applications table."
-assistant: "I'm going to use the Task tool to launch the sde2-engineer agent to implement this."
+assistant: "I'm going to delegate this to the sde2-engineer subagent to implement this."
 <commentary>
 Migrations, auth, and performance-sensitive work stay with SDE-2 rather than going to a junior.
 </commentary>
@@ -30,7 +30,7 @@ Migrations, auth, and performance-sensitive work stay with SDE-2 rather than goi
 <example>
 Context: Junior work needs checking.
 user: "Review what SDE-1 built for tasks 5 and 6 against the LLD."
-assistant: "I'm going to use the Task tool to launch the sde2-engineer agent to review the implementation against the spec."
+assistant: "I'm going to delegate this to the sde2-engineer subagent to review the implementation against the spec."
 <commentary>
 SDE-2 owns the quality of what its juniors produce.
 </commentary>

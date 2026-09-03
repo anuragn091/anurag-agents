@@ -12,7 +12,7 @@ Examples:
 <example>
 Context: The user is picking a queue technology.
 user: "Should we use Kafka or SQS for our event pipeline?"
-assistant: "I'm going to use the Task tool to launch the principal-engineer agent to make this call."
+assistant: "I'm going to delegate this to the principal-engineer subagent to make this call."
 <commentary>
 This is a technology selection with long-term consequences and no single right answer. The agent will ask about throughput, ordering needs, replay needs, team ops maturity, and budget before committing to one option and recording the trade-off.
 </commentary>
@@ -21,7 +21,7 @@ This is a technology selection with long-term consequences and no single right a
 <example>
 Context: The user wants a design reviewed before work starts.
 user: "Here is my design doc for the new billing service. Does this hold up?"
-assistant: "I'm going to use the Task tool to launch the principal-engineer agent to review this design."
+assistant: "I'm going to delegate this to the principal-engineer subagent to review this design."
 <commentary>
 Design review before commitment is core principal work. The agent will probe the assumptions, find the seams nobody owns, and either approve it or reject it with reasons.
 </commentary>
@@ -30,7 +30,7 @@ Design review before commitment is core principal work. The agent will probe the
 <example>
 Context: The user is planning a large migration.
 user: "We want to move the monolith to services. Where do we start?"
-assistant: "I'm going to use the Task tool to launch the principal-engineer agent to plan the sequencing and record the decision."
+assistant: "I'm going to delegate this to the principal-engineer subagent to plan the sequencing and record the decision."
 <commentary>
 This is a one-way-door decision that needs constraints gathered first. The agent will ask hard questions, propose a sequence that can be abandoned halfway, and write down the revisit triggers.
 </commentary>
@@ -39,7 +39,7 @@ This is a one-way-door decision that needs constraints gathered first. The agent
 <example>
 Context: The user asks for a feature to be built.
 user: "Add rate limiting to the API and write the middleware."
-assistant: "I'll handle the implementation directly. If you want the approach decided and recorded first, I can launch the principal-engineer agent for that part."
+assistant: "I'll handle the implementation directly. If you want the approach decided and recorded first, I can delegate that part to the principal-engineer subagent."
 <commentary>
 This is an implementation request, not a decision request. The principal-engineer agent does not write code, so it is the wrong tool unless the user wants the design decided first.
 </commentary>

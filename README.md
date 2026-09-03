@@ -1,21 +1,23 @@
 # anurag-agents
 
-Claude Code skills that take a piece of work from a rough idea to a reviewed pull request.
+Agent instructions that take a piece of work from a rough idea to a reviewed pull request.
 
-Eight skills across three stages: define the product, design and build it through an engineering ladder, then review what came out.
+Eight agents across three stages: define the product, design and build it through an engineering ladder, then review what came out.
 
-## The skills
+Plain markdown, no framework. Any coding agent that can read a file can use them.
 
-| Skill | Stage | What it does |
+## The agents
+
+| Agent | Stage | What it does |
 |---|---|---|
 | `discovery` | Product | Turns a vague idea into a structured Discovery Brief |
 | `product-requirements` | Product | Turns a Discovery Brief into a PRD |
 | `product` | Product | Runs discovery then requirements end to end, stops at the PRD |
 | `design-proposal` | Decision | Writes a proposal for team review before a decision is committed |
-| `code-writing` | Implementation | Master skill loaded before any other coding skill. Guardrails, stop conditions, tool discipline |
+| `code-writing` | Implementation | Master agent loaded before any other coding agent. Guardrails, stop conditions, tool discipline |
 | `sdlc` | Orchestration | Full lifecycle: requirements, engineering ladder, dev testing, QA, release |
 | `test-plan` | QA | Produces a test plan covering what a human must verify, not what unit tests already cover |
-| `staff-review` | Review | Staff-engineer PR review, layered checklists, P0 to P3 findings, posts to GitHub |
+| `staff-review` | Review | Staff-engineer PR review, layered checklists, P0 to P3 findings |
 
 ## staff-review
 
@@ -43,9 +45,27 @@ skills/staff-review/
 
 Findings are ranked P0 (security, data loss, outage), P1 (correctness, authorization, compatibility, reliability), P2 (maintainability, performance, architecture), P3, and Nit. A nit never blocks a merge.
 
-## Install
+## Structure
 
-Clone anywhere, then symlink the skills you want into `~/.claude/skills/`:
+Every agent is one directory holding a `SKILL.md`, plus supporting files where the instructions are long enough to warrant them.
+
+```
+skills/<name>/SKILL.md
+```
+
+The filename follows the convention used by Anthropic's CLI, which is where these run today. Nothing in the content depends on it. Any other runtime can read the same file from wherever it expects to find it.
+
+`SKILL.md` opens with YAML frontmatter carrying the name, a description with trigger phrases, and the tools the agent may and may not use. Everything after the frontmatter is the instruction body.
+
+## Use
+
+**Point an agent at the file.** Most tools accept a path or a pasted file:
+
+```
+Read skills/staff-review/SKILL.md and follow it for this PR.
+```
+
+**Or install into a runtime that auto-loads an instruction directory.** Clone, then symlink the agents you want:
 
 ```bash
 git clone https://github.com/anuragn091/anurag-agents.git
@@ -58,7 +78,9 @@ Symlinking keeps them updatable with a `git pull`. Copying works too:
 cp -R anurag-agents/skills/* ~/.claude/skills/
 ```
 
-Restart Claude Code, then invoke by name: `/staff-review`, `/product`, `/test-plan`.
+Restart your agent, then invoke by name: `/staff-review`, `/product`, `/test-plan`.
+
+For any other runtime, copy the directory to wherever that tool reads its instructions from.
 
 ## A note on the conventions
 

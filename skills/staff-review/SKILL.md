@@ -1,30 +1,17 @@
 ---
 name: staff-review
 description: Staff-engineer code review of a PR, branch, or diff. Reviews intent, correctness, architecture, contracts, security, reliability, performance, maintainability, tests, observability, rollout, UX, org impact, and PR quality, then reports findings by P0-P3 severity and posts them to GitHub. Trigger on "review this PR", "staff review", "review before I merge", "is this safe to ship", "review my branch", or when given a PR number, PR URL, branch name, or diff.
+disallowed-tools: Write Edit NotebookEdit
 metadata:
   author: anurag
   version: "1.1.0"
-  allowed-tools:
-    - Read
-    - Grep
-    - Glob
-    - Bash
-    - WebSearch
-    - WebFetch
-    - AskUserQuestion
-  forbidden-tools:
-    - Write
-    - Edit
-    - Figma
-    - Jira
-    - Linear
 ---
 
 # Staff Review
 
 **Purpose:** review a change the way a staff engineer does. Judge the change against the system it lands in, not against itself. Every finding is verified against the actual code before it is written down, and every finding carries a priority so preference-level feedback never blocks a sound change.
 
-**This skill reviews. It does not fix.** No `Write`, no `Edit`. If the user wants the findings applied, hand the work to a separate implementation pass after the review is posted.
+**This skill reviews. It does not fix.** `disallowed-tools` removes `Write`, `Edit` and `NotebookEdit`, so in Claude Code a review cannot quietly become a commit. Cursor and Codex have no equivalent field, so there the rule holds only because this line says so. If the user wants the findings applied, hand the work to a separate implementation pass after the review is posted.
 
 ---
 
@@ -195,8 +182,14 @@ make the cause and the recovery path obvious? Answer it, do not just ask it.
 
 Repo rule, not optional: any review of a real PR is posted to that PR.
 
+`Write` and `Edit` are disallowed here, so build the review body with a heredoc
+outside the repository rather than writing a file into it:
+
 ```
-gh pr comment <n> --body-file <review.md>
+cat > "${TMPDIR:-/tmp}/review.md" <<'REVIEW'
+...the full review...
+REVIEW
+gh pr comment <n> --body-file "${TMPDIR:-/tmp}/review.md"
 ```
 
 Post the full review with file paths, line numbers and code, not a summary. To request changes or approve, use `gh pr review <n> --request-changes --body-file <file>` or `--approve`.

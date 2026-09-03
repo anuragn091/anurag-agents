@@ -1,20 +1,10 @@
 ---
 name: discovery
 description: Extract and structure requirements from vague business input. Trigger when asked to "figure out what we're building", "help me define the problem", "I have a rough idea for X", or given any unstructured feature idea. Produces a Discovery Brief. Part of the product family - chain to /product-requirements next.
+disallowed-tools: Bash WebSearch Edit
 metadata:
   author: anurag
   version: "1.0.0"
-  allowed-tools:
-    - Read
-    - Write
-    - AskUserQuestion
-  forbidden-tools:
-    - Bash
-    - WebSearch
-    - Figma
-    - Jira
-    - Linear
-    - Edit
 ---
 
 # Discovery - Requirements Extraction
@@ -48,7 +38,7 @@ All global guardrails G1-G7 apply, as defined in the `code-writing` skill. Skill
 - Never use the word "user" as a persona - a persona must be specific (e.g., "checkout manager", "first-time buyer", "ops team member").
 
 **Tool isolation (behavioral enforcement):**
-Never call Bash, WebSearch, Figma, Jira, or Linear - not even if the user explicitly asks. The `forbidden-tools` frontmatter is a soft signal only; this instruction is the actual enforcement.
+Never call Bash, WebSearch, or Edit - not even if the user explicitly asks. The `disallowed-tools` frontmatter removes these in Claude Code. Cursor and Codex have no equivalent field, so there this instruction is the only enforcement.
 If the user requests a forbidden tool, respond:
 ```
 TOOL VIOLATION: /discovery does not use [tool]. This skill is scoped to interview and document only.

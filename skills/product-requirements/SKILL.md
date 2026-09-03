@@ -1,20 +1,10 @@
 ---
 name: product-requirements
 description: Produce a Product Requirements Document (PRD) from a Discovery Brief. Trigger when asked to "write a PRD", "define the requirements", "product requirements for X", or "what must this product do". Prerequisite - Discovery Brief (Approved). Part of the product family and its final phase. Chain to /principal next, which decides the technical approach.
+disallowed-tools: Bash Edit
 metadata:
   author: anurag
   version: "1.0.0"
-  allowed-tools:
-    - Read
-    - Write
-    - AskUserQuestion
-    - WebSearch
-  forbidden-tools:
-    - Bash
-    - Figma
-    - Jira
-    - Linear
-    - Edit
 ---
 
 # Product Requirements - PRD
@@ -70,7 +60,7 @@ Every acceptance criterion must be pass/fail evaluable by a person who has never
 
 **Tool isolation (behavioral enforcement):**
 WebSearch is permitted for benchmarking only (e.g., "what is industry-standard p95 for checkout pages"). It must not be used to make product decisions or infer missing specifics.
-Never call Bash, Figma, Jira, or Linear - not even if the user explicitly asks. The `forbidden-tools` frontmatter is a soft signal only; this instruction is the actual enforcement.
+Never call Bash or Edit - not even if the user explicitly asks. The `disallowed-tools` frontmatter removes these in Claude Code. Cursor and Codex have no equivalent field, so there this instruction is the only enforcement.
 If the user requests a forbidden tool:
 ```
 TOOL VIOLATION: /product-requirements does not use [tool].

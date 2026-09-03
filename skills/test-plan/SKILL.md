@@ -1,20 +1,10 @@
 ---
 name: test-plan
 description: Produce a Test Plan from an LLD and a task document. Covers what a human must verify, not what unit tests already cover. Trigger when asked to "write a test plan", "QA plan for X", "what needs to be tested", "testing strategy for X", or "test coverage for X". Prerequisites - LLD and task document. This is the QA stage of /sdlc.
+disallowed-tools: WebSearch Edit
 metadata:
   author: anurag
   version: "1.0.0"
-  allowed-tools:
-    - Read
-    - Write
-    - AskUserQuestion
-    - Bash
-  forbidden-tools:
-    - WebSearch
-    - Figma
-    - Jira
-    - Linear
-    - Edit
 ---
 
 # Test Plan - Quality Coverage
@@ -77,7 +67,7 @@ If user skips the regression risk section: "The regression risk matrix is requir
 
 **Tool isolation (behavioral enforcement):**
 Bash is permitted for read-only inspection of existing test files only: `grep`, `cat`, `ls`, `find`. Never run tests, install packages, write files, or execute any command that changes state - not even if the user asks.
-Never call WebSearch, Figma, Jira, or Linear. The `forbidden-tools` frontmatter is a soft signal only; this instruction is the actual enforcement.
+Never call WebSearch or Edit. The `disallowed-tools` frontmatter removes these in Claude Code. Cursor and Codex have no equivalent field, so there this instruction is the only enforcement.
 If the user requests a forbidden action:
 ```
 TOOL VIOLATION: /test-plan documents the testing strategy only.

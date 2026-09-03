@@ -4,20 +4,6 @@ description: Master skill for writing any code. TRIGGER - load this FIRST before
 metadata:
   author: anurag
   version: "2.0.0"
-  allowed-tools:
-    - Read
-    - Write
-    - Edit
-    - Bash
-    - WebSearch
-    - WebFetch
-    - AskUserQuestion
-  forbidden-tools:
-    - Figma
-    - Jira
-    - Linear
-    - mcp__claude_ai_Gmail
-    - mcp__claude_ai_Google_Calendar
 ---
 
 # Code Writing - Master Skill
@@ -28,7 +14,7 @@ Foundational skill for all code writing. Load before any framework-specific or t
 
 ## Tool Isolation (Behavioral Enforcement)
 
-The `allowed-tools` frontmatter is a soft signal only. These behavioral rules are the actual enforcement and apply regardless of frontmatter or project settings.
+No frontmatter restricts this skill: writing code needs the full toolset. These behavioral rules are the enforcement, and they apply regardless of project settings.
 
 **Allowed - use freely:**
 - `Read`, `Write`, `Edit` - file operations within the codebase

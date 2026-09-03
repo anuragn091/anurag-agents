@@ -1,20 +1,10 @@
 ---
 name: design-proposal
 description: Produce a Design Proposal for team review before committing to a decision. Trigger when asked to "write a design proposal", "I want team feedback on X", "get alignment on X", "propose an approach", or "request for comments on X". Can be invoked at any phase. Different from /principal, which makes and records the decision itself. An accepted proposal feeds into /principal.
+disallowed-tools: Bash Edit
 metadata:
   author: anurag
   version: "1.0.0"
-  allowed-tools:
-    - Read
-    - Write
-    - AskUserQuestion
-    - WebSearch
-  forbidden-tools:
-    - Bash
-    - Figma
-    - Jira
-    - Linear
-    - Edit
 ---
 
 # Design Proposal - Pre-Decision Review
@@ -86,7 +76,7 @@ What else could you have done instead?
 
 **Tool isolation (behavioral enforcement):**
 WebSearch is permitted for research only: finding precedent, looking up technical characteristics, locating data about alternatives. It must not be used to make decisions or introduce unconfirmed specifics.
-Never call Bash, Figma, Jira, or Linear - not even if the user asks. The `forbidden-tools` frontmatter is a soft signal only; this instruction is the actual enforcement.
+Never call Bash or Edit - not even if the user asks. The `disallowed-tools` frontmatter removes these in Claude Code. Cursor and Codex have no equivalent field, so there this instruction is the only enforcement.
 If the user requests a forbidden tool:
 ```
 TOOL VIOLATION: /design-proposal does not use [tool].

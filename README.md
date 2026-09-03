@@ -2,26 +2,41 @@
 
 Agent instructions that take a piece of work from a rough idea to a reviewed pull request.
 
-Eight agents across three stages: define the product, design and build it through an engineering ladder, then review what came out.
+Two halves. **Workflows** define a process and gate it. **Subagents** are the roles that process hands work to, each pinned to a model and restricted to the tools its job actually needs.
 
 Plain markdown, no framework. Any coding agent that can read a file can use them.
 
-## The agents
+## Workflows
 
-| Agent | Stage | What it does |
+In `skills/`. Invoked by name.
+
+| Workflow | Stage | What it does |
 |---|---|---|
 | `discovery` | Product | Turns a vague idea into a structured Discovery Brief |
 | `product-requirements` | Product | Turns a Discovery Brief into a PRD |
 | `product` | Product | Runs discovery then requirements end to end, stops at the PRD |
 | `design-proposal` | Decision | Writes a proposal for team review before a decision is committed |
-| `code-writing` | Implementation | Master agent loaded before any other coding agent. Guardrails, stop conditions, tool discipline |
+| `code-writing` | Implementation | Master instruction loaded before any other coding workflow. Guardrails, stop conditions, tool discipline |
 | `sdlc` | Orchestration | Full lifecycle: requirements, engineering ladder, dev testing, QA, release |
 | `test-plan` | QA | Produces a test plan covering what a human must verify, not what unit tests already cover |
 | `staff-review` | Review | Staff-engineer PR review, layered checklists, P0 to P3 findings |
 
+## The engineering ladder
+
+In `agents/`. Four rungs, dispatched by `sdlc`. Each one is deliberately barred from the rung above and below it, so a decision never gets made inside an implementation and a spec never gets written by the thing building from it.
+
+| Subagent | Rung | Owns | Refuses | Model |
+|---|---|---|---|---|
+| `principal-engineer` | Principal | The decision, and the record of why it won and what it costs | Writing or editing any code | opus |
+| `senior-engineer` | SDE-3 | HLD then LLD, detailed enough for a junior to build without inventing | Making the decision, writing product code | opus |
+| `sde2-engineer` | SDE-2 | Task breakdown, dispatching juniors in waves, hard implementation | Writing the spec, making the call | sonnet |
+| `sde1-engineer` | SDE-1 | One scoped task with tests, several running in parallel | Migrations, auth, performance, anything with an open decision | sonnet |
+
+Work moves down the ladder: PRD to decision to spec to tasks to code. Anything ambiguous moves back up rather than being guessed at.
+
 ## staff-review
 
-The largest of them. It reviews a PR the way a staff engineer does, and it cannot edit code: `Write` and `Edit` are in `forbidden-tools`, so a review never quietly becomes a commit.
+The largest of the workflows. It reviews a PR the way a staff engineer does, and it cannot edit code: `Write` and `Edit` are in `forbidden-tools`, so a review never quietly becomes a commit.
 
 Checklists are layered. Concerns are technology agnostic and own the question. Platform files sit underneath and show how that question is answered in a given stack.
 
@@ -47,15 +62,14 @@ Findings are ranked P0 (security, data loss, outage), P1 (correctness, authoriza
 
 ## Structure
 
-Every agent is one directory holding a `SKILL.md`, plus supporting files where the instructions are long enough to warrant them.
-
 ```
-skills/<name>/SKILL.md
+skills/<name>/SKILL.md      a workflow, plus supporting files where the instructions warrant them
+agents/<name>.md            a subagent, one file
 ```
 
-The filename follows the convention used by Anthropic's CLI, which is where these run today. Nothing in the content depends on it. Any other runtime can read the same file from wherever it expects to find it.
+Both open with YAML frontmatter. A workflow carries its name, a description with trigger phrases, and the tools it may and may not use. A subagent carries its name, a description with worked routing examples, a model pin, and its tool allowlist.
 
-`SKILL.md` opens with YAML frontmatter carrying the name, a description with trigger phrases, and the tools the agent may and may not use. Everything after the frontmatter is the instruction body.
+The filenames follow the convention used by Anthropic's CLI, which is where these run today. Nothing in the content depends on them. Any other runtime can read the same files from wherever it expects to find them.
 
 ## Use
 
@@ -65,22 +79,25 @@ The filename follows the convention used by Anthropic's CLI, which is where thes
 Read skills/staff-review/SKILL.md and follow it for this PR.
 ```
 
-**Or install into a runtime that auto-loads an instruction directory.** Clone, then symlink the agents you want:
+**Or install into a runtime that auto-loads instruction directories.** Clone, then symlink what you want:
 
 ```bash
 git clone https://github.com/anuragn091/anurag-agents.git
-ln -s "$PWD/anurag-agents/skills/staff-review" ~/.claude/skills/staff-review
+cd anurag-agents
+ln -s "$PWD/skills/staff-review" ~/.claude/skills/staff-review
+ln -s "$PWD/agents/principal-engineer.md" ~/.claude/agents/principal-engineer.md
 ```
 
 Symlinking keeps them updatable with a `git pull`. Copying works too:
 
 ```bash
-cp -R anurag-agents/skills/* ~/.claude/skills/
+cp -R skills/* ~/.claude/skills/
+cp agents/*.md ~/.claude/agents/
 ```
 
-Restart your agent, then invoke by name: `/staff-review`, `/product`, `/test-plan`.
+Restart your agent. Workflows are invoked by name (`/staff-review`, `/product`, `/test-plan`). Subagents are dispatched by a workflow, or requested directly by role.
 
-For any other runtime, copy the directory to wherever that tool reads its instructions from.
+For any other runtime, copy the files to wherever that tool reads its instructions from.
 
 ## A note on the conventions
 

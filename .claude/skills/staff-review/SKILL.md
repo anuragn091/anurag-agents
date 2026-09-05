@@ -124,6 +124,16 @@ Rules:
 
 ## Step 5: Output format
 
+Against a real PR the review is split in two: located findings become inline
+comments on their lines, everything else becomes the summary body. Both go up in
+one call, described in step 6.
+
+Against a local branch or a pasted diff there is nowhere to anchor a comment, so
+write the whole thing as the summary.
+
+Every finding carries `path:line` regardless. That is what decides whether it can
+be inlined, and it is what a reader needs when it cannot.
+
 ```markdown
 ## Staff Review: <PR title>
 
@@ -155,6 +165,9 @@ Rules:
 ### Questions
 <things that could not be verified>
 
+### Not inlined
+<any P0, P1 or P2 whose line is outside the diff, with its `path:line` and why>
+
 ### Six-month question
 If this fails in production six months from now, will the code, tests, telemetry and docs
 make the cause and the recovery path obvious? Answer it, do not just ask it.
@@ -182,27 +195,145 @@ make the cause and the recovery path obvious? Answer it, do not just ask it.
 
 Repo rule, not optional: any review of a real PR is posted to that PR.
 
-`Write` and `Edit` are disallowed here, so build the review body with a heredoc
-outside the repository rather than writing a file into it:
+Post it as **one review** carrying inline comments, not as a wall of text and
+not as a stream of separate comments. A finding anchored to the line it is about
+is acted on. The same finding buried in a summary is skimmed.
+
+### What goes inline, and what does not
+
+| Finding | Where |
+|---|---|
+| P0, P1 or P2 with a file and a line **that appears in the diff** | inline, on that line |
+| P0, P1 or P2 whose line is **not in the diff** | summary, with `path:line` written in the text |
+| Findings that span files, or are about something missing | summary |
+| P3 and nits | summary, collapsed |
+| Verdict, scorecard, six-month question | summary |
+
+**The line must be part of the diff.** GitHub rejects the whole review with a
+422 if any comment names a line outside the changed hunks. This is the failure
+that wastes a review, so check before you post:
 
 ```
-cat > "${TMPDIR:-/tmp}/review.md" <<'REVIEW'
-...the full review...
-REVIEW
-gh pr comment <n> --body-file "${TMPDIR:-/tmp}/review.md"
+gh pr diff <n> --patch | grep -n '^@@'
 ```
 
-Post the full review with file paths, line numbers and code, not a summary. To request changes or approve, use `gh pr review <n> --request-changes --body-file <file>` or `--approve`.
+Each `@@ -a,b +c,d @@` header gives the new-file range `c` to `c+d-1`. A
+comment on a line outside every such range for that file goes in the summary
+instead. Do not guess.
 
-Before finishing, confirm:
-1. Full review posted, not abbreviated.
-2. File paths and line numbers included.
-3. Priority label on every finding.
-4. Verdict stated.
+### Building the review
 
-**Never merge.** Open the review and stop. The merge is Anurag's call.
+`Write` and `Edit` are disallowed here, so build the payload with heredocs
+outside the repository.
 
-If the target is a local branch with no PR, skip the posting step and say so.
+Use **quoted** heredocs (`<<'EOF'`). An unquoted one runs backticks as shell
+commands, and review bodies are full of backticks. Assemble the final JSON with
+`python3` so the summary text is escaped correctly rather than by hand.
+
+```
+D="${TMPDIR:-/tmp}"
+
+# 1. The summary body. Markdown, no escaping needed.
+cat > "$D/summary.md" <<'EOF'
+## Staff Review: <PR title>
+
+**Verdict:** Request changes
+**Checks:** CI green, `pnpm type-check` clean, 3 of 4 review areas covered
+
+### What is good
+...
+EOF
+
+# 2. The inline comments. One object per located finding.
+cat > "$D/comments.json" <<'EOF'
+[
+  {
+    "path": "server/applications/views.py",
+    "line": 120,
+    "side": "RIGHT",
+    "body": "**P1 correctness**: `get_object()` runs on an unfiltered queryset, so any authenticated user reaches another user's application by id.\n\n```suggestion\n        return Application.objects.filter(user=self.request.user)\n```\n\n*Verified by:* read the permission class and the queryset, neither filters by user."
+  },
+  {
+    "path": "app/exports/route.ts",
+    "start_line": 41,
+    "line": 45,
+    "start_side": "RIGHT",
+    "side": "RIGHT",
+    "body": "**P2 performance**: one query per row inside the loop. Fetch the set once before it."
+  }
+]
+EOF
+
+# 3. Assemble and post.
+HEAD_SHA="$(gh pr view <n> --json headRefOid --jq .headRefOid)"
+
+python3 - "$D" "$HEAD_SHA" > "$D/review.json" <<'EOF'
+import json, sys, pathlib
+d, sha = pathlib.Path(sys.argv[1]), sys.argv[2]
+print(json.dumps({
+    "commit_id": sha,
+    "event": "COMMENT",
+    "body": (d / "summary.md").read_text(),
+    "comments": json.loads((d / "comments.json").read_text()),
+}))
+EOF
+
+gh api "repos/{owner}/{repo}/pulls/<n>/reviews" --input "$D/review.json"
+```
+
+Field rules:
+
+- `line` is the line number in the **new** file, with `side: "RIGHT"`. For a line
+  the diff deletes, use the **old** file's number with `side: "LEFT"`.
+- A multi-line finding takes `start_line` and `start_side` alongside `line` and
+  `side`. `start_line` must be the smaller number.
+- `path` is repo-relative, exactly as the diff prints it.
+- `commit_id` is the PR head SHA. Without it the review attaches to whatever is
+  latest, which is wrong if the author pushes while you are reviewing.
+- Inside a JSON string, a newline is `\n` and a fence is three plain backticks.
+  Use a ` ```suggestion ` block wherever the fix is a concrete replacement for
+  those exact lines, and match the indentation of the code it replaces. GitHub
+  renders it as a one-click commit.
+
+### The event
+
+Use `"event": "COMMENT"`. Approving or requesting changes is the human's call,
+not the reviewer skill's. State the verdict in the summary body instead.
+
+If the user explicitly asks for one:
+
+```
+gh pr review <n> --request-changes --body-file "${TMPDIR:-/tmp}/summary.md"
+gh pr review <n> --approve --body-file "${TMPDIR:-/tmp}/summary.md"
+```
+
+Those two carry no inline comments, so post the inline review first.
+
+### When it fails
+
+A 422 means a comment named a line outside the diff. Do not retry the same
+payload and do not drop the review. Move the offending findings into the
+summary body with their `path:line` in text, then post again. If the second
+attempt also fails, post everything as a single issue comment so nothing is
+lost:
+
+```
+gh pr comment <n> --body-file "${TMPDIR:-/tmp}/summary.md"
+```
+
+Say in the response which findings ended up inline and which were demoted.
+
+### Before finishing, confirm
+
+1. One review posted, not a stream of separate comments.
+2. Every located P0, P1 and P2 is inline on its line.
+3. Anything demoted to the summary says why, and carries `path:line` in text.
+4. Priority label on every finding, inline and in the summary.
+5. Verdict stated in the summary body.
+
+**Never merge.** Open the review and stop. The merge is the author's call.
+
+If the target is a local branch with no PR, skip this step and say so.
 
 ---
 

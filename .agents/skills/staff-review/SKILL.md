@@ -137,7 +137,7 @@ be inlined, and it is what a reader needs when it cannot.
 ```markdown
 ## Staff Review: <PR title>
 
-**Verdict:** Approve / Approve with comments / Request changes / Not reviewable as submitted
+**Verdict:** Ship it / Ship after the P1s / Do not ship / Not reviewable as submitted
 **Scope:** <files, lines, layers touched>
 **Checks:** <CI status, lint, type-check, tests: what was run and what it said>
 **Counts:** P0: n | P1: n | P2: n | P3: n | Nits: n
@@ -237,7 +237,7 @@ D="${TMPDIR:-/tmp}"
 cat > "$D/summary.md" <<'EOF'
 ## Staff Review: <PR title>
 
-**Verdict:** Request changes
+**Verdict:** Do not ship
 **Checks:** CI green, `pnpm type-check` clean, 3 of 4 review areas covered
 
 ### What is good
@@ -295,19 +295,18 @@ Field rules:
   those exact lines, and match the indentation of the code it replaces. GitHub
   renders it as a one-click commit.
 
-### The event
+### The event is always COMMENT
 
-Use `"event": "COMMENT"`. Approving or requesting changes is the human's call,
-not the reviewer skill's. State the verdict in the summary body instead.
+`"event": "COMMENT"`, every time. Never `APPROVE`, never `REQUEST_CHANGES`.
 
-If the user explicitly asks for one:
+Approving a pull request and blocking one are the human's calls. A review that
+requests changes sits on the PR as a merge blocker until a person dismisses it,
+and one that approves can satisfy a branch protection rule. Neither belongs to
+a tool that read the diff.
 
-```
-gh pr review <n> --request-changes --body-file "${TMPDIR:-/tmp}/summary.md"
-gh pr review <n> --approve --body-file "${TMPDIR:-/tmp}/summary.md"
-```
-
-Those two carry no inline comments, so post the inline review first.
+State the verdict in the summary body and stop. Even when the user asks for a
+blocking review, post the comment and tell them the verdict, then let them run
+`gh pr review` themselves.
 
 ### When it fails
 

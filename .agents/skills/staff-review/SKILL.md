@@ -195,9 +195,15 @@ make the cause and the recovery path obvious? Answer it, do not just ask it.
 
 Repo rule, not optional: any review of a real PR is posted to that PR.
 
-Post it as **one review** carrying inline comments, not as a wall of text and
-not as a stream of separate comments. A finding anchored to the line it is about
-is acted on. The same finding buried in a summary is skimmed.
+There are three ways to do that, and only the third is right.
+
+| | How | Result |
+|---|---|---|
+| 1 | `gh pr comment` | Every finding in one markdown blob in the conversation tab. Nothing is attached to any code, so the author reads `views.py:120` and goes looking for line 120 themselves. |
+| 2 | `POST /pulls/{n}/comments` in a loop | Each finding lands on its line, but each is a separate event. Twenty findings means twenty notifications and twenty emails. |
+| 3 | `POST /pulls/{n}/reviews` with a `comments` array | Each finding lands on its line, and the whole set is one event: one notification, grouped under one review header. |
+
+Use 3. The rest of this step is how.
 
 ### What goes inline, and what does not
 
@@ -313,8 +319,8 @@ blocking review, post the comment and tell them the verdict, then let them run
 A 422 means a comment named a line outside the diff. Do not retry the same
 payload and do not drop the review. Move the offending findings into the
 summary body with their `path:line` in text, then post again. If the second
-attempt also fails, post everything as a single issue comment so nothing is
-lost:
+attempt also fails, fall back to option 1 above. A blob in the conversation tab
+is worse than inline comments and better than a lost review:
 
 ```
 gh pr comment <n> --body-file "${TMPDIR:-/tmp}/summary.md"

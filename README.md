@@ -93,6 +93,8 @@ Four rungs, dispatched by the skills above. Each is barred from the rung over an
 
 The largest of the skills, and the one most worth reading on its own. It reviews a PR the way a staff engineer does, and it cannot edit code: `disallowed-tools` removes `Write`, `Edit` and `NotebookEdit`, so in Claude Code a review cannot quietly become a commit.
 
+Findings land as **inline comments on the lines they are about**, posted as one review rather than a stream of separate comments. A fix that is a concrete replacement goes in a ` ```suggestion ` block, so the author commits it in one click. Anything that cannot be anchored, because its line is outside the diff or it spans files, goes in the summary with its `path:line` written out.
+
 Checklists are layered. Concerns are technology agnostic and own the question. Platform files sit underneath and show how that question gets answered in a given stack.
 
 ```
